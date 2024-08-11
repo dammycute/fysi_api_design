@@ -1,0 +1,469 @@
+openapi: 3.0.0
+info:
+  title: User and Product Management API
+  description: API for managing users and products
+  version: 1.0.0
+
+paths:
+  /users/register:
+    post:
+      summary: Create a new user account
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: User Successfully Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistrationResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict (e.g., username or email already exists)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/login:
+    post:
+      summary: Authenticate a user and receive a JWT
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/profile:
+    get:
+      summary: Retrieve the current user’s profile
+      tags:
+        - Users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update the current user’s profile
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileUpdateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/change-password:
+    put:
+      summary: Change the user’s password
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePasswordResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/reset-password-request:
+    post:
+      summary: Request a password reset token
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/reset-password:
+    post:
+      summary: Reset the user’s password using a reset token
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized (e.g., invalid or expired token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/account:
+    delete:
+      summary: Delete the user’s account
+      tags:
+        - Users
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    UserRegistration:
+      type: object
+      properties:
+        username:
+          type: string
+          example: 'john.doe'
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        password:
+          type: string
+          format: password
+          example: john.doe894
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+      required:
+        - username
+        - email
+        - password
+        - firstName
+        - lastName
+
+    UserRegistrationResponse:
+      type: object
+      properties: 
+        id:
+          type: string
+          example: eythhlkkjkdhjdhd1242...
+        username:
+          type: string
+          example: 'john.doe'
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        password:
+          type: string
+          format: password
+          example: john.doe894
+      required:
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OD...
+        expiresIn:
+          type: number
+          example: 5mins
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          example: eythhlkkjkdhjdhd1242...
+        username:
+          type: string
+          example: john.doe
+        email:
+          type: string
+          format: email
+          example: john.doe@exmaple.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        createdAt:
+          type: string
+          format: date-time
+          example: 2022-01-01T00:00:00.000Z
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+          example: new-john.doe
+        email:
+          type: string
+          format: email
+          example: new-john.doe@exmaple.com
+        firstName:
+          type: string
+          example: New-John
+        lastName:
+          type: string
+          example: Doe
+
+    ProfileUpdateResponse:
+      type: object
+      properties: 
+        id: 
+          type: string
+          example: hgdjhdhdgh373hdf
+        username:
+          type: string
+          example: new-john.doe
+        email:
+          type: string
+          format: email
+          example: new-john.doe@exmaple.com
+        firstName:
+          type: string
+          example: New-John
+        lastName:
+          type: string
+          example: Doe
+
+    ChangePassword:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          format: password
+          example: oldpassword
+        newPassword:
+          type: string
+          format: password
+          example: newpassword
+      required:
+        - currentPassword
+        - newPassword
+
+    ChangePasswordResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Password Changed Successfully
+
+    PasswordResetRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+      required:
+        - email
+
+    PasswordResetResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: The otp has been sent, check your email
+
+    PasswordReset:
+      type: object
+      properties:
+        token:
+          type: string
+          example: 123456
+        newPassword:
+          type: string
+          format: password
+          example: newpassword
+      required:
+        - token
+        - newPassword
+
+    PasswordResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Successful password reset.
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: An error occurred.
