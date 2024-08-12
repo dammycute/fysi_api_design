@@ -467,3 +467,295 @@ components:
         message:
           type: string
           example: An error occurred.
+
+/users/cart/get-cart:
+    GET:
+      summary: Retrieve the current user’s cart
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Json with items and total amount by user
+        '400':
+          description: no content found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+   /users/cart/add-to-cart:
+    post:
+      summary: add a product to cart
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+user/cart/delete:
+    delete:
+      summary: Remove all items from the cart
+      responses:
+        '204':
+          description: All items removed from the cart.
+          content: {}
+
+user/cart/update:
+    put:
+      summary: Update the quantity of a product in the cart
+       tags:
+        - Users
+      requestBody:
+        description: The quantity to update for the specified product.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: number
+                  example: 3
+      responses:
+        '200':
+          description: A confirmation message that the cart item was updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "Cart item updated"
+
+    delete:
+      summary: Remove a product from the cart
+        description: The ID of the product to remove from the cart.
+      responses:
+        '204':
+          description: The product was removed from the cart.
+          content: {}
+
+          /admin/analytics/sales:
+    get:
+      summary: Retrieve sales analytics data
+      operationId: getSalesAnalytics
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Start date for the analytics period (ISO 8601 format).
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: End date for the analytics period (ISO 8601 format).
+        - name: groupBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+          description: Group the sales data by day, week, or month.
+      responses:
+        '200':
+          description: Sales analytics data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalSales:
+                    type: number
+                    example: 100000.00
+                  orderCount:
+                    type: number
+                    example: 1500
+                  averageOrderValue:
+                    type: number
+                    example: 66.67
+                  salesByPeriod:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                          example: "2024-08-01"
+                        sales:
+                          type: number
+                          example: 20000.00
+                        orderCount:
+                          type: number
+                          example: 300
+                  topSellingProducts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "12345"
+                        name:
+                          type: string
+                          example: "Product Name"
+                        unitsSold:
+                          type: number
+                          example: 500
+                        revenue:
+                          type: number
+                          example: 50000.00
+
+  /admin/analytics/users:
+    get:
+      summary: Retrieve user analytics data
+      operationId: getUserAnalytics
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Start date for the analytics period (ISO 8601 format).
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: End date for the analytics period (ISO 8601 format).
+      responses:
+        '200':
+          description: User analytics data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: number
+                    example: 10000
+                  newUsers:
+                    type: number
+                    example: 500
+                  activeUsers:
+                    type: number
+                    example: 7000
+                  usersByCountry:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        country:
+                          type: string
+                          example: "United States"
+                        userCount:
+                          type: number
+                          example: 5000
+
+  /admin/users:
+    get:
+      summary: Retrieve a list of all users (Admin only)
+      operationId: listAllUsers
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: Number of users to retrieve per page.
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query to filter users by username, email, or name.
+      responses:
+        '200':
+          description: List of users retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "1"
+                        username:
+                          type: string
+                          example: "johndoe"
+                        email:
+                          type: string
+                          example: "johndoe@example.com"
+                        firstName:
+                          type: string
+                          example: "John"
+                        lastName:
+                          type: string
+                          example: "Doe"
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T12:00:00Z"
+                  total:
+                    type: number
+                    example: 100
+                  page:
+                    type: number
+                    example: 1
+                  limit:
+                    type: number
+                    example: 20
